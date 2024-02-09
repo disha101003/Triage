@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
 
-# Assuming `document.document_content` contains your CSV data
 df = pd.read_csv(
     "c:/Users/suddu/Downloads/Python/ML/TATRCManikinOnlyDataset/Collect 1/D01_G1_vitals_C3.csv"
 )
@@ -27,7 +26,6 @@ print(df.columns)
 # Strip leading and trailing whitespaces from column names
 df.columns = df.columns.str.strip()
 
-# Now you can access columns without errors
 plt.plot(df["Elapsed Time (ms)"], df["HR"])
 plt.title("Heart Rate Over Time")
 plt.xlabel("Time (ms)")
@@ -74,7 +72,7 @@ optimizer = torch.optim.Adam(model.parameters())
 for epoch in range(num_epochs):
     for X, y in dataloader:
         X = X.float()  # Convert input tensor to float32
-        y = y.float()  # Convert target tensor to float32
+        y = y.float()
         pred = model(X)
         loss = criterion(pred, y.view(-1, 1))
 
