@@ -1,5 +1,3 @@
-# Load your dataset into a suitable data structure, such as a Pandas DataFrame.
-
 import pandas as pd
 
 # Read the CSV file into a Pandas DataFrame
@@ -12,8 +10,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader, random_split
 import pandas as pd
-
-# Assuming df is your Pandas DataFrame
 
 # Extract features and labels
 X = torch.tensor(df.drop('Estimated Blood Lossbsp;', axis=1).values, dtype=torch.float32)
