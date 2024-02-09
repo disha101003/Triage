@@ -12,7 +12,6 @@ file_path = r"TATRCManikinOnlyDataset\Collect 1\D01_G1_vitals_C3.csv"
 
 df = pd.read_csv(file_path)
 
-# Assuming X_train, y_train are your feature matrix and labels
 # Replace these with your actual data
 X_train = df.iloc[:, 1:-1].values
 y_train = df.iloc[:, -1].values
