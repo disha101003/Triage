@@ -1,0 +1,513 @@
+/**********************************************************************
+ Copyright (c) 2020-2023, Unitree Robotics.Co.Ltd. All rights reserved.
+***********************************************************************/
+
+#include "unitree_legged_sdk/unitree_legged_sdk.h"
+#include <math.h>
+#include <iostream>
+#include <unistd.h>
+#include <string.h>
+
+using namespace UNITREE_LEGGED_SDK;
+/*
+class Custom
+{
+public:
+  Custom(uint8_t level) : safe(LeggedType::Go1),
+                          udp(level, 8090, "192.168.12.1", 8082)
+  {
+    udp.InitCmdData(cmd);
+  }
+  void UDPRecv();
+  void UDPSend();
+  void RobotControl();
+
+  Safety safe;
+  UDP udp;
+  HighCmd cmd = {0};
+  HighState state = {0};
+  int motiontime = 0;
+  float dt = 0.002; // 0.001~0.01
+};
+
+*/
+
+class Custom
+{
+public:
+    // Custom(uint8_t level): safe(LeggedType::A1), udp(level){
+    Custom(uint8_t level): safe(LeggedType::A1), udp(8090, "192.168.12.1", 8082, sizeof(HighCmd), sizeof(HighState)){
+    // Custom(uint8_t level): safe(LeggedType::A1), udp(8090, "192.168.123.161", 8082, sizeof(HighCmd), sizeof(HighState)){
+        udp.InitCmdData(cmd);
+        udp.SetDisconnectTime(dt, 1);
+        // udp.SetDisconnectTime(0, 0);
+    }
+    void UDPRecv();
+    void UDPSend();
+    void RobotControl();
+
+    Safety safe;
+    UDP udp;
+    HighCmd cmd = {0};
+    HighState state = {0};
+    int motiontime = 0;
+    float dt = 0.002;     // 0.001~0.01
+};
+
+void Custom::UDPRecv()
+{
+  udp.Recv();
+}
+
+void Custom::UDPSend()
+{
+  udp.Send();
+}
+
+void Custom::RobotControl()
+{
+  motiontime += 2;
+  udp.GetRecv(state);
+  //   printf("%d   %f\n", motiontime, state.imu.quaternion[2]);
+  cmd.mode = 0; // 0:idle, default stand      1:forced stand     2:walk continuously
+  cmd.gaitType = 0;
+  cmd.speedLevel = 0;
+  cmd.footRaiseHeight = 0;
+  cmd.bodyHeight = 0;
+  cmd.euler[0] = 0;
+  cmd.euler[1] = 0;
+  cmd.euler[2] = 0;
+  cmd.velocity[0] = 0.0f;
+  cmd.velocity[1] = 0.0f;
+  cmd.yawSpeed = 0.0f;
+  cmd.reserve = 0;
+
+  if (motiontime > 0 && motiontime < 1000)
+  {
+    cmd.mode = 1;
+    cmd.euler[0] = -0.3;
+    // only prints once 
+    if (motiontime == 500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 1000 && motiontime < 2000)
+  {
+    cmd.mode = 1;
+    cmd.euler[0] = 0.3;
+    if (motiontime == 1500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 2000 && motiontime < 3000)
+  {
+    cmd.mode = 1;
+    cmd.euler[1] = -0.2;
+    if (motiontime == 2500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 3000 && motiontime < 4000)
+  {
+    cmd.mode = 1;
+    cmd.euler[1] = 0.2;
+    if (motiontime == 3500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 4000 && motiontime < 5000)
+  {
+    cmd.mode = 1;
+    cmd.euler[2] = -0.2;
+    if (motiontime == 4500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 5000 && motiontime < 6000)
+  {
+    cmd.mode = 1;
+    cmd.euler[2] = 0.2;
+    if (motiontime == 5500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 6000 && motiontime < 7000)
+  {
+    cmd.mode = 1;
+    cmd.bodyHeight = -0.2;
+    if (motiontime == 6500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 7000 && motiontime < 8000)
+  {
+    cmd.mode = 1;
+    cmd.bodyHeight = 0.1;
+    if (motiontime == 7500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 8000 && motiontime < 9000)
+  {
+    cmd.mode = 1;
+    cmd.bodyHeight = 0.0;
+    if (motiontime == 8500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 9000 && motiontime < 11000)
+  {
+    cmd.mode = 5;
+    if (motiontime == 9500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 11000 && motiontime < 13000)
+  {
+    cmd.mode = 7;
+    if (motiontime == 11500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 13000 && motiontime < 15000)
+  {
+    cmd.mode = 6;
+    if (motiontime == 13500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 15000 && motiontime < 16000)
+  {
+    cmd.mode = 0;
+    if (motiontime == 15300) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 16000 && motiontime < 20000)
+  {
+    cmd.mode = 2;
+    cmd.gaitType = 2;
+    cmd.velocity[0] = 0.4f;
+    cmd.yawSpeed = 2;
+    cmd.footRaiseHeight = 0.1;
+    if (motiontime == 16500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 20000 && motiontime < 22000)
+  {
+    cmd.mode = 0;
+    cmd.velocity[0] = 0;
+    if (motiontime == 20500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 22000 && motiontime < 26000)
+  {
+    cmd.mode = 2;
+    cmd.gaitType = 1;
+    cmd.velocity[0] = 0.2f;
+    cmd.bodyHeight = 0.1;
+    if (motiontime == 22500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+
+  // straightHand mode usage
+  if (motiontime > 26000 && motiontime < 27000)
+  {
+    cmd.mode = 1;
+    if (motiontime == 26500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 27000 && motiontime < 35000)
+  {
+    cmd.mode = 11;
+    if (motiontime == 27500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+
+  // jumpYaw mode usage
+  if (motiontime > 35000 && motiontime < 36000)
+  {
+    cmd.mode = 1;
+    if (motiontime == 35500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+  if (motiontime > 36000 && motiontime < 37000)
+  {
+    cmd.mode = 10;
+    if (motiontime == 36500) {
+        printf("motiontime: %d", motiontime);
+        printf("mode: %d", cmd.mode); 
+        printf("gaitType: %d", cmd.gaitType);
+        printf("speedLevel: %d", cmd.speedLevel);
+        printf("footRaiseHeight: %d", cmd.footRaiseHeight);
+        printf("bodyHeight: %d", cmd.bodyHeight);
+        printf("euler 0: %d", cmd.euler[0]);
+        printf("euler 1: %d", cmd.euler[1]);
+        printf("euler 2: %d", cmd.euler[2]);
+        printf("velocity 0: %.2f", cmd.velocity[0]);
+        printf("velocity 1: %.2f", cmd.velocity[1]);
+        printf("yawSpeed: %.2f", cmd.yawSpeed);
+        printf("reserve: %d", cmd.reserve);
+    }
+  }
+
+  udp.SetSend(cmd);
+}
+
+int main(void)
+{
+  std::cout << "Communication level is set to HIGH-level." << std::endl
+            << "WARNING: Make sure the robot is standing on the ground." << std::endl
+            << "Press Enter to continue..." << std::endl;
+  std::cin.ignore();
+
+  Custom custom(HIGHLEVEL);
+  LoopFunc loop_control("control_loop", custom.dt, boost::bind(&Custom::RobotControl, &custom));
+  LoopFunc loop_udpSend("udp_send", custom.dt, 3, boost::bind(&Custom::UDPSend, &custom));
+  LoopFunc loop_udpRecv("udp_recv", custom.dt, 3, boost::bind(&Custom::UDPRecv, &custom));
+
+  loop_udpSend.start();
+  loop_udpRecv.start();
+  loop_control.start();
+
+  while (1)
+  {
+    sleep(10);
+  };
+
+  return 0;
+}
